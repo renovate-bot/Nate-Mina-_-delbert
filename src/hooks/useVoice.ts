@@ -68,15 +68,10 @@ export const useVoice = (onSpeechResult: (text: string) => void): UseVoiceReturn
     
     // Set voice characteristics based on assistant
     switch (assistant) {
-      case 'jenduh':
-        utterance.rate = 0.9;
-        utterance.pitch = 1.1;
-        utterance.volume = 0.8;
-        break;
       case 'dorky':
-        utterance.rate = 1.1;
+        utterance.rate = 1.0;
         utterance.pitch = 1.0;
-        utterance.volume = 0.9;
+        utterance.volume = 0.8;
         break;
       case 'delbert':
         utterance.rate = 0.8;
@@ -87,6 +82,11 @@ export const useVoice = (onSpeechResult: (text: string) => void): UseVoiceReturn
         utterance.rate = 1.2;
         utterance.pitch = 0.7;
         utterance.volume = 1.0;
+        break;
+      case 'jenduh':
+        utterance.rate = 0.9;
+        utterance.pitch = 1.1;
+        utterance.volume = 0.8;
         break;
     }
 

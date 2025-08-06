@@ -16,20 +16,20 @@ export const AssistantProfile: React.FC<AssistantProfileProps> = ({
 
   const getAssistantIcon = (type: AssistantType) => {
     switch (type) {
-      case 'jenduh': return <Star className="w-8 h-8" />;
       case 'dorky': return <User className="w-8 h-8" />;
       case 'delbert': return <AlertTriangle className="w-8 h-8" />;
       case 'dismo': return <X className="w-8 h-8" />;
+      case 'jenduh': return <Star className="w-8 h-8" />;
       default: return <User className="w-8 h-8" />;
     }
   };
 
   const getAssistantTheme = (type: AssistantType) => {
     switch (type) {
-      case 'jenduh': return 'from-blue-600 via-purple-600 to-indigo-600';
       case 'dorky': return 'from-orange-500 via-amber-500 to-yellow-500';
       case 'delbert': return 'from-red-600 via-rose-600 to-pink-600';
       case 'dismo': return 'from-gray-800 via-gray-900 to-black';
+      case 'jenduh': return 'from-blue-600 via-purple-600 to-indigo-600';
       default: return 'from-blue-600 via-purple-600 to-indigo-600';
     }
   };

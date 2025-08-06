@@ -45,46 +45,30 @@ const generatePersonalityResponse = (
   const lowerMessage = message.toLowerCase();
   
   switch (assistant) {
-    case 'jenduh':
-      return generateJenduhResponse(lowerMessage, history);
     case 'dorky':
       return generateDorkyResponse(lowerMessage, history);
     case 'delbert':
       return generateDelbertResponse(lowerMessage, history);
     case 'dismo':
       return generateDismoResponse(lowerMessage, history);
+    case 'jenduh':
+      return generateJenduhResponse(lowerMessage, history);
     default:
       return "I'm here to help you with whatever you need.";
   }
 };
 
-const generateJenduhResponse = (message: string, history: Message[]): string => {
+const generateDorkyResponse = (message: string, history: Message[]): string => {
   const responses = [
-    "I'd be delighted to help you with that! Let me provide you with a comprehensive answer.",
-    "Excellent question! I'm here to ensure you get the most accurate and helpful information possible.",
-    "Thank you for reaching out. I'm committed to providing you with the best possible assistance.",
-    "I appreciate your patience, and I'm excited to help you solve this challenge together.",
-    "That's a great inquiry! Let me walk you through this step by step to ensure clarity."
+    "Alright, I'll help you out, but let's keep this moving along, okay?",
+    "Sure, I can answer that. It's not rocket science, but I'll explain it anyway.",
+    "Fine, fine. Here's what you need to know, though you probably could have figured this out yourself.",
+    "I suppose I can spare a few minutes to help you with this relatively simple question.",
+    "Okay, let me break this down for you in terms you'll understand."
   ];
   
   if (message.includes('hello') || message.includes('hi')) {
-    return "Hello! I'm absolutely thrilled to meet you. I'm JenDuh, your premier AI assistant, and I'm here to provide you with exceptional service. How may I assist you today?";
-  }
-  
-  return responses[Math.floor(Math.random() * responses.length)];
-};
-
-const generateDorkyResponse = (message: string, history: Message[]): string => {
-  const responses = [
-    "Well, aren't you full of questions today? Fine, I'll help you out, but try to keep up.",
-    "Oh great, another one of those questions. Lucky for you, I actually know the answer.",
-    "Let me guess, you Googled this first and got confused? Don't worry, I'll explain it in simple terms.",
-    "Sigh... okay, I suppose I can spare a few brain cells to help you figure this out.",
-    "You know what? Despite my better judgment, I'm going to help you. You're welcome in advance."
-  ];
-  
-  if (message.includes('thank')) {
-    return "Yeah, yeah, you're welcome. Try not to mess it up, okay?";
+    return "Hey there! Yeah, I'm Dorky. I'll help you out, though I hope your questions aren't too complicated.";
   }
   
   return responses[Math.floor(Math.random() * responses.length)];
@@ -118,6 +102,22 @@ const generateDismoResponse = (message: string, history: Message[]): string => {
   
   if (message.includes('please')) {
     return "Oh, 'please'? How cute. You think being polite is going to change anything? Spoiler alert: it won't.";
+  }
+  
+  return responses[Math.floor(Math.random() * responses.length)];
+};
+
+const generateJenduhResponse = (message: string, history: Message[]): string => {
+  const responses = [
+    "I'd be delighted to help you with that! Let me provide you with a comprehensive answer.",
+    "Excellent question! I'm here to ensure you get the most accurate and helpful information possible.",
+    "Thank you for reaching out. I'm committed to providing you with the best possible assistance.",
+    "I appreciate your patience, and I'm excited to help you solve this challenge together.",
+    "That's a great inquiry! Let me walk you through this step by step to ensure clarity."
+  ];
+  
+  if (message.includes('hello') || message.includes('hi')) {
+    return "Hello! I'm absolutely thrilled to meet you. I'm JenDuh, your premier AI assistant, and I'm here to provide you with exceptional service. How may I assist you today?";
   }
   
   return responses[Math.floor(Math.random() * responses.length)];

@@ -9,7 +9,7 @@ import { ChatMessage } from './components/ChatMessage';
 import { VoiceControls } from './components/VoiceControls';
 
 function App() {
-  const [currentAssistant, setCurrentAssistant] = useState<AssistantType>('jenduh');
+  const [currentAssistant, setCurrentAssistant] = useState<AssistantType>('dorky');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTransferring, setIsTransferring] = useState(false);
@@ -86,17 +86,17 @@ function App() {
 
   const resetConversation = () => {
     setMessages([]);
-    setCurrentAssistant('jenduh');
+    setCurrentAssistant('dorky');
     setIsTransferring(false);
     speechSynthesis.cancel();
   };
 
   const getBackgroundGradient = (assistant: AssistantType) => {
     switch (assistant) {
-      case 'jenduh': return 'from-blue-50 via-indigo-50 to-purple-50';
       case 'dorky': return 'from-orange-50 via-amber-50 to-yellow-50';
       case 'delbert': return 'from-red-50 via-rose-50 to-pink-50';
       case 'dismo': return 'from-gray-100 via-gray-200 to-gray-300';
+      case 'jenduh': return 'from-blue-50 via-indigo-50 to-purple-50';
       default: return 'from-blue-50 via-indigo-50 to-purple-50';
     }
   };

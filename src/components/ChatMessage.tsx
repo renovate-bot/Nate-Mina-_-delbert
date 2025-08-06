@@ -11,10 +11,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   
   const getAssistantColor = (assistant: string) => {
     switch (assistant) {
-      case 'jenduh': return 'bg-gradient-to-r from-blue-500 to-indigo-600';
       case 'dorky': return 'bg-gradient-to-r from-orange-500 to-amber-600';
       case 'delbert': return 'bg-gradient-to-r from-red-500 to-rose-600';
       case 'dismo': return 'bg-gradient-to-r from-gray-700 to-black';
+      case 'jenduh': return 'bg-gradient-to-r from-blue-500 to-indigo-600';
       default: return 'bg-gradient-to-r from-blue-500 to-indigo-600';
     }
   };

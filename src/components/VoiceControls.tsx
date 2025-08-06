@@ -34,10 +34,10 @@ export const VoiceControls: React.FC<VoiceControlsProps> = ({
 
   const getAssistantColor = (assistant: AssistantType) => {
     switch (assistant) {
-      case 'jenduh': return 'from-blue-500 to-indigo-600';
       case 'dorky': return 'from-orange-500 to-amber-600';
       case 'delbert': return 'from-red-500 to-rose-600';
       case 'dismo': return 'from-gray-700 to-black';
+      case 'jenduh': return 'from-blue-500 to-indigo-600';
       default: return 'from-blue-500 to-indigo-600';
     }
   };
