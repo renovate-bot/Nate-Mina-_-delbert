@@ -53,3 +53,4 @@ export const generateResponse = async (
     text: aiResponse,
     shouldTransfer: false
   };
+}
