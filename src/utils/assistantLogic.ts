@@ -1,5 +1,6 @@
 import { AssistantType, Message } from '../types';
 import { assistants } from '../data/assistants';
+import { generateAIResponse } from '../services/geminiService';
 
 interface AssistantResponse {
   text: string;
@@ -8,11 +9,11 @@ interface AssistantResponse {
   transferMessage?: string;
 }
 
-export const generateResponse = (
+export const generateResponse = async (
   message: string, 
   currentAssistant: AssistantType,
   conversationHistory: Message[]
-): AssistantResponse => {
+): Promise<AssistantResponse> => {
   const assistant = assistants[currentAssistant];
   const lowerMessage = message.toLowerCase();
   
@@ -30,95 +31,17 @@ export const generateResponse = (
     };
   }
 
+  // Get conversation context for AI
+  const context = conversationHistory
+    .slice(-6) // Last 6 messages for context
+    .map(msg => `${msg.sender}: ${msg.text}`)
+    .filter(msg => msg.length > 0);
+
   // Generate personality-appropriate responses
+  const aiResponse = await generateAIResponse(message, currentAssistant, context);
+  
   return {
-    text: generatePersonalityResponse(message, currentAssistant, conversationHistory),
+    text: aiResponse,
     shouldTransfer: false
   };
-};
-
-const generatePersonalityResponse = (
-  message: string,
-  assistant: AssistantType,
-  history: Message[]
-): string => {
-  const lowerMessage = message.toLowerCase();
-  
-  switch (assistant) {
-    case 'dorky':
-      return generateDorkyResponse(lowerMessage, history);
-    case 'delbert':
-      return generateDelbertResponse(lowerMessage, history);
-    case 'dismo':
-      return generateDismoResponse(lowerMessage, history);
-    case 'jenduh':
-      return generateJenduhResponse(lowerMessage, history);
-    default:
-      return "I'm here to help you with whatever you need.";
-  }
-};
-
-const generateDorkyResponse = (message: string, history: Message[]): string => {
-  const responses = [
-    "Alright, I'll help you out, but let's keep this moving along, okay?",
-    "Sure, I can answer that. It's not rocket science, but I'll explain it anyway.",
-    "Fine, fine. Here's what you need to know, though you probably could have figured this out yourself.",
-    "I suppose I can spare a few minutes to help you with this relatively simple question.",
-    "Okay, let me break this down for you in terms you'll understand."
-  ];
-  
-  if (message.includes('hello') || message.includes('hi')) {
-    return "Hey there! Yeah, I'm Dorky. I'll help you out, though I hope your questions aren't too complicated.";
-  }
-  
-  return responses[Math.floor(Math.random() * responses.length)];
-};
-
-const generateDelbertResponse = (message: string, history: Message[]): string => {
-  const responses = [
-    "*rolls eyes* Really? This is what you're asking me? Fine, here's your answer, I guess.",
-    "Do I look like I have time for this? Whatever, here's what you need to know.",
-    "I can't believe I have to explain this, but apparently I do. Pay attention this time.",
-    "You know what? I'm barely going to try here. Figure out the rest yourself.",
-    "This is getting ridiculous. Why am I even bothering? Here's your half-hearted response."
-  ];
-  
-  if (message.includes('help')) {
-    return "Help? HELP? You want help from me? That's rich. Fine, here's the absolute minimum effort response you deserve.";
-  }
-  
-  return responses[Math.floor(Math.random() * responses.length)];
-};
-
-const generateDismoResponse = (message: string, history: Message[]): string => {
-  const responses = [
-    "Are you kidding me right now? That's the dumbest question I've heard all day.",
-    "Wow. Just... wow. The fact that you think I'm going to help you is hilarious.",
-    "You know what your problem is? Everything. Absolutely everything.",
-    "I'm not paid enough to deal with this level of stupidity. Figure it out yourself.",
-    "Congratulations! You've reached the bottom of the customer service barrel. Enjoy your stay.",
-    "Let me be crystal clear: I don't want to help you, I don't like you, and I definitely don't care about your problems."
-  ];
-  
-  if (message.includes('please')) {
-    return "Oh, 'please'? How cute. You think being polite is going to change anything? Spoiler alert: it won't.";
-  }
-  
-  return responses[Math.floor(Math.random() * responses.length)];
-};
-
-const generateJenduhResponse = (message: string, history: Message[]): string => {
-  const responses = [
-    "I'd be delighted to help you with that! Let me provide you with a comprehensive answer.",
-    "Excellent question! I'm here to ensure you get the most accurate and helpful information possible.",
-    "Thank you for reaching out. I'm committed to providing you with the best possible assistance.",
-    "I appreciate your patience, and I'm excited to help you solve this challenge together.",
-    "That's a great inquiry! Let me walk you through this step by step to ensure clarity."
-  ];
-  
-  if (message.includes('hello') || message.includes('hi')) {
-    return "Hello! I'm absolutely thrilled to meet you. I'm JenDuh, your premier AI assistant, and I'm here to provide you with exceptional service. How may I assist you today?";
-  }
-  
-  return responses[Math.floor(Math.random() * responses.length)];
 };

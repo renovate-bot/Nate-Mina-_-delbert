@@ -94,12 +94,18 @@ const getFallbackResponse = (message: string, assistant: AssistantType): string 
   }
 };
 
-// Gemini Voice Integration
-export const speakWithGeminiVoice = async (text: string, assistant: AssistantType): Promise<void> => {
-  // Note: Gemini's voice API is still in development
-  // For now, we'll enhance the existing Web Speech API with personality-specific settings
-  
+// Enhanced Voice Integration with Personality-Specific Settings
+export const speakWithEnhancedVoice = async (text: string, assistant: AssistantType): Promise<void> => {
   const utterance = new SpeechSynthesisUtterance(text);
+  
+  // Wait for voices to load
+  if (speechSynthesis.getVoices().length === 0) {
+    await new Promise(resolve => {
+      speechSynthesis.addEventListener('voiceschanged', resolve, { once: true });
+    });
+  }
+  
+  const voices = speechSynthesis.getVoices();
   
   // Enhanced voice characteristics based on assistant personality
   switch (assistant) {
@@ -108,8 +114,8 @@ export const speakWithGeminiVoice = async (text: string, assistant: AssistantTyp
       utterance.pitch = 1.0;
       utterance.volume = 0.8;
       // Try to find a slightly sarcastic-sounding voice
-      const dorkyVoices = speechSynthesis.getVoices().filter(voice => 
-        voice.name.includes('Female') || voice.name.includes('Samantha')
+      const dorkyVoices = voices.filter(voice => 
+        voice.name.includes('Female') || voice.name.includes('Samantha') || voice.lang.includes('en-US')
       );
       if (dorkyVoices.length > 0) utterance.voice = dorkyVoices[0];
       break;
@@ -119,8 +125,8 @@ export const speakWithGeminiVoice = async (text: string, assistant: AssistantTyp
       utterance.pitch = 0.7;
       utterance.volume = 0.7;
       // Try to find a more monotone voice
-      const delbertVoices = speechSynthesis.getVoices().filter(voice => 
-        voice.name.includes('Male') && !voice.name.includes('Enhanced')
+      const delbertVoices = voices.filter(voice => 
+        voice.name.includes('Male') && voice.lang.includes('en')
       );
       if (delbertVoices.length > 0) utterance.voice = delbertVoices[0];
       break;
@@ -130,8 +136,8 @@ export const speakWithGeminiVoice = async (text: string, assistant: AssistantTyp
       utterance.pitch = 0.6;
       utterance.volume = 1.0;
       // Try to find a more aggressive-sounding voice
-      const dismoVoices = speechSynthesis.getVoices().filter(voice => 
-        voice.name.includes('Male') || voice.name.includes('Daniel')
+      const dismoVoices = voices.filter(voice => 
+        (voice.name.includes('Male') || voice.name.includes('Daniel')) && voice.lang.includes('en')
       );
       if (dismoVoices.length > 0) utterance.voice = dismoVoices[0];
       break;
@@ -141,8 +147,8 @@ export const speakWithGeminiVoice = async (text: string, assistant: AssistantTyp
       utterance.pitch = 1.2;
       utterance.volume = 0.8;
       // Try to find a professional, pleasant voice
-      const jenduhVoices = speechSynthesis.getVoices().filter(voice => 
-        voice.name.includes('Enhanced') || voice.name.includes('Premium')
+      const jenduhVoices = voices.filter(voice => 
+        (voice.name.includes('Enhanced') || voice.name.includes('Premium') || voice.name.includes('Google')) && voice.lang.includes('en')
       );
       if (jenduhVoices.length > 0) utterance.voice = jenduhVoices[0];
       break;
@@ -150,10 +156,29 @@ export const speakWithGeminiVoice = async (text: string, assistant: AssistantTyp
 
   return new Promise((resolve) => {
     utterance.onend = () => resolve();
+    utterance.onerror = () => resolve(); // Resolve even on error to prevent hanging
     speechSynthesis.speak(utterance);
   });
 };
 
 export const getAvailableVoices = (): SpeechSynthesisVoice[] => {
   return speechSynthesis.getVoices();
+};
+
+// Enhanced Speech Recognition with better accuracy
+export const createEnhancedSpeechRecognition = (): SpeechRecognition | null => {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    return null;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  
+  // Enhanced settings for better recognition
+  recognition.continuous = false; // Changed to false for better accuracy
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recognition.maxAlternatives = 3; // Get multiple alternatives for better accuracy
+  
+  return recognition;
 };

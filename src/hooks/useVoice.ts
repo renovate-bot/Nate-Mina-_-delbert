@@ -1,111 +1,55 @@
-import { useState, useCallback, useRef } from 'react';
-import { AssistantType } from '../types';
+import { AssistantType, Message } from '../types';
+import { assistants } from '../data/assistants';
+import { generateAIResponse } from '../services/geminiService';
+import { generateAIResponse } from '../services/geminiService';
 
-interface UseVoiceReturn {
-  isListening: boolean;
-  isSpeaking: boolean;
-  startListening: () => void;
-  stopListening: () => void;
-  speak: (text: string, assistant: AssistantType) => void;
-  toggleSpeaking: () => void;
+interface AssistantResponse {
+  text: string;
+  shouldTransfer: boolean;
+  nextAssistant?: AssistantType;
+  transferMessage?: string;
 }
 
-export const useVoice = (onSpeechResult: (text: string) => void): UseVoiceReturn => {
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(true);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+export const generateResponse = async (
+  message: string, 
+  currentAssistant: AssistantType,
+  conversationHistory: Message[]
+): Promise<AssistantResponse> => {
+  const assistant = assistants[currentAssistant];
+  const lowerMessage = message.toLowerCase();
+  
+  // Check for transfer triggers
+  const shouldTransfer = assistant.transferTriggers.some(trigger => 
+    lowerMessage.includes(trigger.toLowerCase())
+  );
 
-  const startListening = useCallback(() => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in your browser');
-      return;
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-      setIsListening(true);
+  if (shouldTransfer && assistant.nextAssistant) {
+    return {
+      text: assistant.transferMessage,
+      shouldTransfer: true,
+      nextAssistant: assistant.nextAssistant,
+      transferMessage: assistant.transferMessage
     };
+  }
 
-    recognition.onresult = (event) => {
-      const last = event.results.length - 1;
-      const text = event.results[last][0].transcript;
-      
-      if (event.results[last].isFinal) {
-        onSpeechResult(text);
-      }
-    };
+  // Get conversation context for AI
+  const context = conversationHistory
+    .slice(-6) // Last 6 messages for context
+    .map(msg => `${msg.sender}: ${msg.text}`)
+    .filter(msg => msg.length > 0);
 
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      setIsListening(false);
-    };
+  // Get conversation context for AI
+  const context = conversationHistory
+    .slice(-6) // Last 6 messages for context
+    .map(msg => `${msg.sender}: ${msg.text}`)
+    .filter(msg => msg.length > 0);
 
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
-  }, [onSpeechResult]);
-
-  const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
-    setIsListening(false);
-  }, []);
-
-  const speak = useCallback((text: string, assistant: AssistantType) => {
-    if (!isSpeaking) return;
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Set voice characteristics based on assistant
-    switch (assistant) {
-      case 'dorky':
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 0.8;
-        break;
-      case 'delbert':
-        utterance.rate = 0.8;
-        utterance.pitch = 0.8;
-        utterance.volume = 0.7;
-        break;
-      case 'dismo':
-        utterance.rate = 1.2;
-        utterance.pitch = 0.7;
-        utterance.volume = 1.0;
-        break;
-      case 'jenduh':
-        utterance.rate = 0.9;
-        utterance.pitch = 1.1;
-        utterance.volume = 0.8;
-        break;
-    }
-
-    speechSynthesis.speak(utterance);
-  }, [isSpeaking]);
-
-  const toggleSpeaking = useCallback(() => {
-    setIsSpeaking(prev => !prev);
-    if (isSpeaking) {
-      speechSynthesis.cancel();
-    }
-  }, [isSpeaking]);
-
+  // Generate personality-appropriate responses
+  const aiResponse = await generateAIResponse(message, currentAssistant, context);
+  
+  const aiResponse = await generateAIResponse(message, currentAssistant, context);
+  
   return {
-    isListening,
-    isSpeaking,
-    startListening,
-    stopListening,
-    speak,
-    toggleSpeaking
+    text: aiResponse,
+    shouldTransfer: false
   };
-};
